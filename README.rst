@@ -10,7 +10,7 @@ Install `Graphviz <https://www.graphviz.org/>`_ first! The command "dot" should 
 
 example:
 
-.. dot:: attack_plan.svg
+.. dot:: svg
 
     digraph G {
         rankdir=LR
