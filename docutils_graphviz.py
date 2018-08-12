@@ -25,6 +25,7 @@ register:
 from docutils.parsers.rst import directives
 directives.register_directive('dot', Graphviz)
 """
+from bs4 import BeautifulSoup
 
 from docutils import nodes
 from docutils.parsers import rst
@@ -40,6 +41,8 @@ class Graphviz(rst.Directive):
     final_argument_whitespace = True
     option_spec = {
         'alt': rst.directives.unchanged,
+        'height': rst.directives.length_or_percentage_or_unitless,
+        'width': rst.directives.length_or_percentage_or_unitless,
     }
 
     def run(self):
@@ -53,18 +56,29 @@ class Graphviz(rst.Directive):
             output = src.pipe(format=filetype)
 
             if filetype == 'svg':
-                data_url_filetype = 'svg+xml'
-                img = output.decode('utf-8')
+                soup = BeautifulSoup(output.decode('utf-8'), 'html5lib')
+                svg = soup.find('svg')
+                if svg:
+                    if 'width' in self.options:
+                        svg.attrs['width'] = self.options['width']
+                    if 'height' in self.options:
+                        svg.attrs['height'] = self.options['height']
+                    img = '<div>%s</div>' % svg
+                else:
+                    img = output.decode('utf-8')
 
             if filetype == 'png':
                 data_url_filetype = 'png'
-                encoding = 'base64'
                 output = base64.b64encode(output).decode()
-                data_path = "data:image/%s;%s,%s" % (
-                    data_url_filetype,
-                    encoding,
-                    output)
-                img = '<img src="%s" alt="%s" />' % (data_path, alt)
+                data_path = "data:image/%s;base64,%s" % (data_url_filetype, output)
+                attrs = []
+                attrs.append('src="%s"' % data_path)
+                attrs.append('alt="%s"' % alt)
+                if 'width' in self.options:
+                    attrs.append('width="%s"' % self.options['width'])
+                if 'height' in self.options:
+                    attrs.append('height="%s"' % self.options['height'])
+                img = '<img %s />' % ' '.join(attrs)
 
         except Exception as err:
             raise self.error(str(err))

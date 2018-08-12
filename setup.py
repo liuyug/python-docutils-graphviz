@@ -18,5 +18,5 @@ setup(
     description='Graphviz extension for docutils',
     long_description=long_description,
     py_modules=['docutils_graphviz'],
-    install_requires=['docutils', 'graphviz'],
+    install_requires=['docutils', 'graphviz', 'beautifulsoup4', 'html5lib'],
 )

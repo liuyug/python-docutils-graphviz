@@ -1,2 +1,4 @@
 docutils
 graphviz
+beautifulsoup4
+html5lib

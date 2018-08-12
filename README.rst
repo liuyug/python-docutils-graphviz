@@ -19,6 +19,9 @@ register::
 example:
 
 .. dot:: svg
+    :widht: 100%
+    :height: 100%
+    :alt: image.svg
 
     digraph G {
         node[fontname="simsun"]
