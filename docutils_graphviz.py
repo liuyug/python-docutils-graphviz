@@ -25,6 +25,8 @@ register:
 from docutils.parsers.rst import directives
 directives.register_directive('dot', Graphviz)
 """
+import subprocess
+
 from bs4 import BeautifulSoup
 
 from docutils import nodes
@@ -79,7 +81,11 @@ class Graphviz(rst.Directive):
                 if 'height' in self.options:
                     attrs.append('height="%s"' % self.options['height'])
                 img = '<img %s />' % ' '.join(attrs)
-
+        except subprocess.CalledProcessError as exec_err:
+            err = str(exec_err)
+            if exec_err.stderr:
+                err += (': ' + exec_err.stderr.decode())
+            raise self.error(err)
         except Exception as err:
             raise self.error(str(err))
         return [nodes.raw('', img, format='html')]
